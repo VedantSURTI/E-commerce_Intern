@@ -36,16 +36,24 @@ function Carousel({ images }) {
     <MDBCarousel showIndicators showControls fade>
       {images.map((ele, i) => (
         <MDBCarouselItem itemId={i + 1} key={i + 1}>
-          <img src={ele} className="d-block w-100" alt={`Slide ${i + 1}`} />
+          <img
+            src={`http://localhost:5000${ele}`}
+            className="d-block w-100"
+            alt={`Slide ${i + 1}`}
+          />
         </MDBCarouselItem>
       ))}
     </MDBCarousel>
   );
 }
 
-const NumberButton = ({ initialCount, onIncrement, onDecrement }) => {
-  const [count, setCount] = useState(initialCount);
-
+const NumberButton = ({
+  count,
+  setCount,
+  initialCount,
+  onIncrement,
+  onDecrement,
+}) => {
   const handleIncrement = () => {
     setCount(count + 1);
     if (onIncrement) {
@@ -78,6 +86,7 @@ const NumberButton = ({ initialCount, onIncrement, onDecrement }) => {
 export default function Product() {
   const authState = useSelector((state) => state.auth);
   const { id } = useParams();
+  const [count, setCount] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -97,11 +106,11 @@ export default function Product() {
     getProduct();
   }, [id]);
 
-  const addToCart = async (productId, token) => {
+  const addToCart = async (productId, count, token) => {
     try {
       const response = await axiosInstance.post(
         "/customer/products/add-to-cart",
-        { productId },
+        { productId, quantity: count },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -133,7 +142,7 @@ export default function Product() {
   const handleAddWishList = async (id) => {
     try {
       const response = await axiosInstance.post(
-        `http://192.168.20.173:5000/api/wishlist/add`,
+        `/wishlist/add`,
         { productId: id },
         {
           headers: {
@@ -167,7 +176,7 @@ export default function Product() {
                   className="text-center"
                   style={{ margin: "0px", padding: "0px" }}
                 >
-                  <Carousel images={product.imageUrl} />
+                  <Carousel images={product.imageUrls} />
                 </MDBCardBody>
               </MDBCard>
 
@@ -224,14 +233,20 @@ export default function Product() {
                       <MDBCardText>Quantity</MDBCardText>
                     </MDBCol>
                     <MDBCol sm="9">
-                      <NumberButton initialCount={1} />
+                      <NumberButton
+                        count={count}
+                        setCount={setCount}
+                        initialCount={1}
+                      />
                     </MDBCol>
                   </MDBRow>
                   <hr />
                   <MDBRow>
                     <MDBCol>
                       <MDBBtn
-                        onClick={() => addToCart(product._id, authState.token)}
+                        onClick={() =>
+                          addToCart(product._id, count, authState.token)
+                        }
                       >
                         Add to Cart
                       </MDBBtn>

@@ -12,9 +12,9 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setToken, updateUserLocation } from "../reducers/authSlice";
+import axiosInstance from "../axiosInstance";
 
 function Copyright(props) {
   return (
@@ -83,19 +83,19 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const location = { coordinates: [latitude, longitude] };
+    const location = { type: "Point", coordinates: [latitude, longitude] };
     const sendData = {
       email: data.get("email"),
       password: data.get("password"),
     };
     // console.log(sendData);
-    const loginResponse = await axios.post(
-      "http://192.168.20.173:5000/api/auth/customer/login",
+    const loginResponse = await axiosInstance.post(
+      "/auth/customer/login",
       sendData
     );
     dispatch(setToken(loginResponse.data.token, loginResponse.data.user));
-    const locationUpdateResponse = await axios.put(
-      "http://192.168.20.173:5000/api/users-update/update-location",
+    const locationUpdateResponse = await axiosInstance.put(
+      "/users-update/update-location",
       location,
       {
         headers: { Authorization: `Bearer ${loginResponse.data.token}` },
@@ -103,11 +103,9 @@ export default function SignIn() {
     );
 
     dispatch(updateUserLocation(location));
-    if(loginResponse.data.user.role==='admin'){
+    if (loginResponse.data.user.role === "admin") {
       navigate("/super-admin");
-    }
-    else
-    navigate("/");
+    } else navigate("/");
   };
 
   return (

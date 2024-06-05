@@ -12,16 +12,15 @@ import {
 
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import axiosInstance from "../axiosInstance";
+import Electronics from "./Electronics";
+import TextExpander from "./components/TextExpander";
 
-const fetchFeaturedProducts = async (category) => {
+const fetchFeaturedProducts = async () => {
   try {
-    const response = await axios.get(
-      "http://192.168.20.173:5000/api/customer/products/featured",
-      { params: { category } }
-    );
+    const response = await axiosInstance.get("/customer/products/trending");
     return response.data;
   } catch (error) {
     console.error("Error fetching featured products:", error);
@@ -29,7 +28,7 @@ const fetchFeaturedProducts = async (category) => {
   }
 };
 
-function TrendingArea({ category }) {
+function TrendingArea() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,7 +36,7 @@ function TrendingArea({ category }) {
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const data = await fetchFeaturedProducts(category);
+        const data = await fetchFeaturedProducts();
         setProducts(data);
       } catch (error) {
         setError(error);
@@ -47,7 +46,7 @@ function TrendingArea({ category }) {
     };
 
     getProducts();
-  }, [category]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -58,30 +57,36 @@ function TrendingArea({ category }) {
   }
   return (
     <>
-      <h2>{category}</h2>
-      <MDBRow>
-        {products.map((product) => (
-          <MDBCol key={product._id} md="4">
-            <MDBCard>
-              <MDBCardImage
-                src={
-                  product.imageUrl[0] ||
-                  "https://mdbootstrap.com/img/new/standard/nature/184.webp"
-                }
-                position="top"
-                alt={product.name}
-              />
-              <MDBCardBody>
-                <MDBCardTitle>{product.name}</MDBCardTitle>
-                <MDBCardText>{product.description}</MDBCardText>
-                <MDBBtn onClick={() => navigate(`/product/${product._id}`)}>
-                  View Details
-                </MDBBtn>
-              </MDBCardBody>
-            </MDBCard>
-          </MDBCol>
-        ))}
-      </MDBRow>
+      {products.map((singleCategory) => (
+        <>
+          <h2>{singleCategory.category}</h2>
+          <MDBRow>
+            {singleCategory.trendingProducts.map((product) => (
+              <MDBCol key={product._id} md="4">
+                <MDBCard className="same-size-card">
+                  <MDBCardImage className="same-size-card-image"
+                    src={
+                      `${process.env.REACT_APP_IMAGE_PREFIX}${product.imageUrls[0]}` ||
+                      "https://mdbootstrap.com/img/new/standard/nature/184.webp"
+                    }
+                    position="top"
+                    alt={product.name}
+                  />
+                  <MDBCardBody>
+                    <MDBCardTitle>{product.name}</MDBCardTitle>
+                    <MDBCardText>
+                      <TextExpander>{product.description}</TextExpander>
+                    </MDBCardText>
+                    <MDBBtn onClick={() => navigate(`/product/${product._id}`)}>
+                      View Details
+                    </MDBBtn>
+                  </MDBCardBody>
+                </MDBCard>
+              </MDBCol>
+            ))}
+          </MDBRow>
+        </>
+      ))}
     </>
   );
 }
@@ -120,9 +125,7 @@ function Outlet() {
       </div>
       <MDBContainer>
         <h2 style={{ margin: "50px 0px" }}>Trending Products</h2>
-        <TrendingArea category={"Electronics"} />
-        <TrendingArea category={"Grocery"} />
-        <TrendingArea category={"Furniture"} />
+        <TrendingArea />
       </MDBContainer>
     </>
   );

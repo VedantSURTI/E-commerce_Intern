@@ -23,6 +23,7 @@ import SellerList from "./components/SellerList";
 import { Create } from "@mui/icons-material";
 import CreateSubCategory from "./components/CreateSubCategory";
 import CreateMainCategory from "./components/CreateMainCategory";
+import AdminProductList from "./components/AdminProductList";
 
 function SuperAdmin() {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -72,42 +73,36 @@ function SuperAdmin() {
           </nav>
         </MDBCol>
         <MDBCol md="8">
-          <Box
-            sx={{
-              width: "100%",
-              maxWidth: 360,
-            }}
-          >
-            <Divider />
-            <Box
-              component="span"
-              sx={{ display: "flex", justifyContent: "center", padding:'1rem' }}
-            >
-              {selectedIndex === 1 && (
-                <h5>
-                  <FontAwesomeIcon icon={faUser} /> Seller's List
-                  <SellerList />
-                </h5>
-              )}
-              {selectedIndex === 2 && (
-                <h5>
-                  <FontAwesomeIcon icon={faBoxesStacked} /> Product's List
-                </h5>
-              )}
-              {selectedIndex === 3 && (
-                <h5>
-                  <FontAwesomeIcon icon={faSitemap} /> Create Sub Category
-                  <CreateSubCategory />
-                </h5>
-              )}
-              {selectedIndex === 4 && (
-                <h5>
-                  <FontAwesomeIcon icon={faSitemap} /> Create Main Category
-                  <CreateMainCategory />
-                </h5>
-              )}
-            </Box>
-          </Box>
+          <Divider />
+
+          {selectedIndex === 1 && (
+            <>
+              <h5 style={{ display: "flex", justifyContent: "center" }}>
+                <FontAwesomeIcon icon={faUser} /> Seller's List
+              </h5>
+              <SellerList />
+            </>
+          )}
+          {selectedIndex === 2 && (
+            <>
+              <h5>
+                <FontAwesomeIcon icon={faBoxesStacked} /> Product's List
+              </h5>
+              <AdminProductList />
+            </>
+          )}
+          {selectedIndex === 3 && (
+            <h5>
+              <FontAwesomeIcon icon={faSitemap} /> Create Sub Category
+              <CreateSubCategory />
+            </h5>
+          )}
+          {selectedIndex === 4 && (
+            <h5>
+              <FontAwesomeIcon icon={faSitemap} /> Create Main Category
+              <CreateMainCategory />
+            </h5>
+          )}
         </MDBCol>
       </MDBRow>
     </div>

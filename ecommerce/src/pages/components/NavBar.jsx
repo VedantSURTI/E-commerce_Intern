@@ -10,18 +10,76 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping, faHeart } from "@fortawesome/free-solid-svg-icons";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import axiosInstance from "../../axiosInstance";
+import { MDBCardText } from "mdb-react-ui-kit";
+import { logoutBoth } from "../../reducers/authSlice";
+
+const fetchMainCategories = async () => {
+  try {
+    const response = await axiosInstance.get("/categories/main");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching main categories:", error);
+    throw error;
+  }
+};
+
+const fetchSubCategories = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/categories/${id}/subcategories`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching subcategories:", error);
+    throw error;
+  }
+};
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const authState = useSelector((state) => state.auth);
-  // console.log(authState.user.email);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [categories, setCategories] = React.useState([]);
+  const [subCategories, setSubCategories] = React.useState({}); // State to store subcategories
+
+  React.useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const data = await fetchMainCategories();
+        setCategories(data);
+
+        // Fetch subcategories for each main category
+        const subCategoriesData = await Promise.all(
+          data.map(async (category) => {
+            const subData = await fetchSubCategories(category._id);
+            return { [category._id]: subData };
+          })
+        );
+
+        // Merge all subcategories into one object
+        const mergedSubCategories = subCategoriesData.reduce((acc, curr) => {
+          return { ...acc, ...curr };
+        }, {});
+
+        setSubCategories(mergedSubCategories);
+      } catch (error) {
+        alert(error);
+      }
+    };
+
+    getCategories();
+  }, []);
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -36,6 +94,32 @@ function NavBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  async function handleLogout() {
+    try {
+      const response = await axiosInstance.post(
+        `/auth/customer/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authState.token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // Update authState
+        dispatch(logoutBoth());
+
+        // Redirect to login page
+        navigate("/");
+      } else {
+        alert("Logout failed:", response);
+      }
+    } catch (error) {
+      alert("Error during logout:", error);
+    }
+  }
 
   return (
     <AppBar position="static">
@@ -90,13 +174,31 @@ function NavBar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              <NavLink to="/electronics">Electronics</NavLink>
-              <br />
-              <NavLink to="/grocery">Grocery</NavLink>
-              <br />
-              <NavLink to="/fashion">Fashion</NavLink>
-              <br />
-              <NavLink to="/furniture">Furniture</NavLink>
+              {categories.map((category) => (
+                <React.Fragment key={category._id}>
+                  <MenuItem onClick={handleCloseNavMenu}>
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1-content"
+                        id="panel1-header"
+                      >
+                        {category.name}
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {subCategories[category._id] ? (
+                          subCategories[category._id].map((sub) => (
+                            <Typography key={sub._id}>{sub.name}</Typography>
+                          ))
+                        ) : (
+                          <Typography>Loading...</Typography>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+                  </MenuItem>
+                  <hr />
+                </React.Fragment>
+              ))}
             </Menu>
           </Box>
           <Typography
@@ -119,19 +221,36 @@ function NavBar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             <NavDropdown title="Categories" id="basic-nav-dropdown">
-              <NavDropdown.Item>
-                <NavLink to="/electronics">Electronics</NavLink>
-              </NavDropdown.Item>
-
-              <NavDropdown.Item>
-                <NavLink to="/grocery">Grocery</NavLink>
-              </NavDropdown.Item>
-              <NavDropdown.Item>
-                <NavLink to="/furniture">Furniture</NavLink>
-              </NavDropdown.Item>
+              {categories.map((category) => (
+                <React.Fragment key={category._id}>
+                  <MenuItem onClick={handleCloseNavMenu}>
+                    <Accordion style={{ width: "200px" }}>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1-content"
+                        id="panel1-header"
+                      >
+                        <NavLink to={`/category/${category._id}`}>
+                          {category.name}
+                        </NavLink>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {subCategories[category._id] ? (
+                          subCategories[category._id].map((sub) => (
+                            <Typography key={sub._id}>{sub.name}</Typography>
+                          ))
+                        ) : (
+                          <Typography>Loading...</Typography>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+                  </MenuItem>
+                  <hr />
+                </React.Fragment>
+              ))}
             </NavDropdown>
           </Box>
-          {authState.token !== "" && (
+          {authState.token !== "" && authState.user.email !== "" && (
             <>
               <NavLink
                 to="/cart"
@@ -169,11 +288,6 @@ function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {/* {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))} */}
               {authState.token === "" ? (
                 <MenuItem key="login" onClick={handleCloseUserMenu}>
                   <NavLink to="/login" textAlign="center">
@@ -199,10 +313,10 @@ function NavBar() {
                 </MenuItem>
               ) : null}
               {authState.token !== "" ? (
-                <MenuItem key="logout" onClick={handleCloseUserMenu}>
-                  <NavLink to="/logout" textAlign="center">
+                <MenuItem key="logout">
+                  <MDBCardText textAlign="center" onClick={handleLogout}>
                     Logout
-                  </NavLink>
+                  </MDBCardText>
                 </MenuItem>
               ) : null}
             </Menu>
@@ -212,4 +326,5 @@ function NavBar() {
     </AppBar>
   );
 }
+
 export default NavBar;

@@ -10,65 +10,76 @@ import {
   MDBBtn,
   MDBRow,
 } from "mdb-react-ui-kit";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import axiosInstance from "../axiosInstance";
 import { useSelector } from "react-redux";
 import Footer from "./components/Footer";
 import Pagination from "@mui/material/Pagination";
 
-const subcategories_names = ["Earphone", "Laptop", "Phone"];
-const brands_names = ["Samsung"];
-const sort_names = ["ascending", "descending"];
+const sort_names = [
+  { _id: 1, name: "asc" },
+  { _id: 2, name: "desc" },
+];
 
-const fetchProducts = async (token, category) => {
-  try {
-    const response = await axiosInstance.get("/customer/products/category", {
-      params: { category },
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching featured products:", error);
-    throw error;
-  }
-};
 function Electronics() {
   const authState = useSelector((state) => state.auth);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [subcategory, setSubcategory] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+  const [subcategory, setSubcategory] = useState({ name: "", id: "" });
   const [brand, setBrand] = useState("");
-  const [sort, setSort] = useState("");
+  const [sort, setSort] = useState({ name: "asc", id: 1 });
   const [maxPrice, setMaxPrice] = useState(500);
   const navigate = useNavigate();
-  const category = "Electronics";
-  // console.log(page);
+  const { id } = useParams();
+  const limit = 3;
 
-  function handleChangecategory(e) {
-    setSubcategory(e.target.value);
-  }
-  function handleChangebrand(e) {
+
+  const handleChangecategory = (e, selectedSubcategory) => {
+    setSubcategory({
+      name: selectedSubcategory.name,
+      id: selectedSubcategory._id,
+    });
+  };
+  const handleChangebrand = (e) => {
     setBrand(e.target.value);
-  }
-  function handleChangeSort(e) {
-    setSort(e.target.value);
-  }
-  function handleChangeMaxPrice(e) {
-    setMaxPrice(e.target.value);
-  }
+  };
 
+  const handleChangeSort = (e, selectedSort) => {
+    console.log(selectedSort);
+    // const selectedOption = JSON.parse(e.target.value);
+    setSort({ name: selectedSort.name, id: selectedSort._id });
+  };
+
+  const handleChangeMaxPrice = (e, newValue) => {
+    setMaxPrice(newValue);
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(event.target.textContent);
+  };
+  console.log(page);
   const getFilteredProducts = async (token, params) => {
     try {
-      const response = await axiosInstance.get("/customer/products/category", {
-        params,
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axiosInstance.post(
+        "/customer/products/getproducts",
+        {
+          type: "Point",
+          coordinates: [
+            authState.user.location.coordinates[1],
+            authState.user.location.coordinates[0],
+          ],
         },
-      });
-      console.log(response.data);
+        {
+          params,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -76,59 +87,49 @@ function Electronics() {
     }
   };
 
-  useEffect(()=>{
-    const handleFilterClick = async () => {
-      const params = {
-        category,
-        subcategory,
+  const handleFilterClick = async () => {
+    let params;
+    if (subcategory.id === "") {
+      params = {
+        categoryId: id,
         page,
-        limit: 10,
-        brand,
-        priceMin: 100,
+        limit,
+        minPrice: 100,
         maxPrice,
-        sort,
+        sortOrder: sort.name,
       };
-      console.log(params);
-  
-      try {
-        const data = await getFilteredProducts(authState.token, params);
-        setProducts(data);
-      } catch (error) {
-        console.error("Error loading products:", error);
-      }
-    };
-    handleFilterClick();
-  },[authState.token, category, page, subcategory, brand, maxPrice, sort])
+    } else {
+      params = {
+        categoryId: id,
+        subcategoryId: subcategory.id,
+        page,
+        limit,
+        minPrice: 100,
+        maxPrice,
+        sortOrder: sort.name,
+      };
+    }
+
+    try {
+      setLoading(true);
+      const data = await getFilteredProducts(authState.token, params);
+      setProducts(data.products);
+      setTotalPages(Math.ceil(data.totalProducts / limit));
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const data = await fetchProducts(authState.token, category);
-        setProducts(data);
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProducts();
-  }, [authState.token, category]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+    handleFilterClick();
+  }, [authState.token, id, maxPrice, page, sort, subcategory.id]);
 
   return (
     <div>
       <NavBar />
       <Filters
-        subcategories_names={subcategories_names}
-        brands_names={brands_names}
         subcategory={subcategory}
         brand={brand}
         maxPrice={maxPrice}
@@ -138,15 +139,17 @@ function Electronics() {
         onChangeSort={handleChangeSort}
         onChangeMaxPrice={handleChangeMaxPrice}
         sort={sort}
-        // onClickFilter={handleFilterClick}
+        onClickFilter={handleFilterClick}
       />
+      {loading && <div>Loading...</div>}
+      {error && <div>Error fetching products: {error.message}</div>}
       <MDBRow style={{ marginRight: "0" }}>
         {products.map((product) => (
           <MDBCol key={product._id} md="4">
             <MDBCard style={{ margin: "1rem" }}>
               <MDBCardImage
                 src={
-                  product.imageUrl[0] ||
+                  `${process.env.REACT_APP_IMAGE_PREFIX}${product.imageUrls[0]}` ||
                   "https://mdbootstrap.com/img/new/standard/nature/184.webp"
                 }
                 position="top"
@@ -166,10 +169,9 @@ function Electronics() {
       </MDBRow>
       <Pagination
         className="pagination-style"
-        onChange={(e) => {
-          setPage(e.target.textContent);
-        }}
-        count={10}
+        onChange={(e) => handlePageChange(e)}
+        count={totalPages}
+        page={page}
       />
       <Footer />
     </div>

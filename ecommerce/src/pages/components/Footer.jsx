@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   MDBFooter,
   MDBContainer,
@@ -7,8 +7,32 @@ import {
   MDBIcon,
 } from "mdb-react-ui-kit";
 import { NavLink } from "react-router-dom";
+import axiosInstance from "../../axiosInstance";
+
+const fetchMainCategories = async () => {
+  try {
+    const response = await axiosInstance.get("/categories/main");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching main categories:", error);
+    throw error;
+  }
+};
 
 export default function Footer() {
+  const [categories, setCategories] = useState([]);
+  React.useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const data = await fetchMainCategories();
+        setCategories(data);
+      } catch (error) {
+        alert(error);
+      }
+    };
+
+    getCategories();
+  }, []);
   return (
     <MDBFooter bgColor="light" className="text-center text-lg-start text-muted">
       <section className="">
@@ -34,16 +58,16 @@ export default function Footer() {
 
             <MDBCol md="2" lg="2" xl="2" className="mx-auto mb-4">
               <h6 className="text-uppercase fw-bold mb-4">Categories</h6>
-              <p>
-                <NavLink to="/electronics">Electronics</NavLink>
-              </p>
-              <p>
-                <NavLink to="/grocery">Grocery</NavLink>
-              </p>
-
-              <p>
-                <NavLink to="/furniture">Furniture</NavLink>
-              </p>
+              {categories.map((category) => {
+                return (
+                  <p>
+                    <NavLink to={`/category/${category._id}`}>
+                      {" "}
+                      {category.name}
+                    </NavLink>
+                  </p>
+                );
+              })}
             </MDBCol>
 
             <MDBCol md="3" lg="2" xl="2" className="mx-auto mb-4">

@@ -82,9 +82,43 @@ const authSlice = createSlice({
         state.seller = action.payload.seller;
       },
     },
+    logoutBoth: {
+      reducer(state, action) {
+        state.token = "";
+        state.user = {
+          email: "",
+          firstName: "",
+          lastName: "",
+          address: { street: "", city: "", state: "", country: "", zip: "" },
+          location: { coordinates: [] },
+          phone: "",
+          photo: "",
+          ordersCount: 0,
+        };
+        state.seller = {
+          email: "",
+          firstName: "",
+          lastName: "",
+          address: { street: "", city: "", state: "", country: "", zip: "" },
+          location: { coordinates: [] },
+          phone: "",
+          photo: "",
+          companyName: "",
+          businessRegistrationNumber: "",
+          bankName: "",
+          accountNumber: "",
+          ordersCount: 0,
+        };
+      },
+    },
   },
 });
-export const { setToken, updateUserData, updateUserLocation, setSellerToken } =
-  authSlice.actions;
+export const {
+  setToken,
+  updateUserData,
+  updateUserLocation,
+  setSellerToken,
+  logoutBoth,
+} = authSlice.actions;
 
 export default authSlice.reducer;

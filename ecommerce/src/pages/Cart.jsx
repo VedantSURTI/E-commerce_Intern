@@ -13,14 +13,17 @@ import {
   MDBBtn,
   MDBRow,
 } from "mdb-react-ui-kit";
+import { useNavigate } from "react-router";
+import TextExpander from "./components/TextExpander";
 
 function Cart() {
   const [cart, setcart] = useState([]);
   const token = useSelector((state) => state.auth.token); // Get token from Redux store
+  const navigate = useNavigate();
 
   const addToCart = async (productId, token) => {
     try {
-      const response = await axiosInstance.post(
+      await axiosInstance.post(
         "/customer/products/add-to-cart",
         { productId },
         {
@@ -75,24 +78,46 @@ function Cart() {
     getcart();
   }, [token]);
 
-  const NumberButton = ({ initialCount, onIncrement, onDecrement }) => {
+  const NumberButton = ({ id, initialCount, onIncrement, onDecrement }) => {
     const [count, setCount] = useState(initialCount);
 
+    useEffect(() => {
+      async function updateCart() {
+        try {
+          await axiosInstance.put(
+            `/customer/products/cart`,
+            { productId: id, quantity: count },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        } catch (error) {
+          console.error("Error updating cart:", error);
+        }
+      }
+      if (count !== initialCount) {
+        updateCart();
+      }
+    }, [count, id, initialCount, token]);
+
     const handleIncrement = () => {
-      setCount(count + 1);
+      setCount((prevCount) => prevCount + 1);
       if (onIncrement) {
         onIncrement(count + 1);
       }
     };
 
     const handleDecrement = () => {
-      if (count > initialCount) {
-        setCount(count - 1);
+      if (count > 1) {
+        setCount((prevCount) => prevCount - 1);
         if (onDecrement) {
           onDecrement(count - 1);
         }
       }
     };
+
     return (
       <div className="number-button">
         <button className="decrement-button" onClick={handleDecrement}>
@@ -105,41 +130,77 @@ function Cart() {
       </div>
     );
   };
+  function handleCheckout() {
+    // alert("Checkout is not implemented yet.");
+    async function checkout() {
+      try {
+        const res = await axiosInstance.post(
+          "/checkout",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        // alert("Checkout successful");
+        const url = res.data.paymentLink;
+        window.location.href = url;
+        setcart([]);
+      } catch (error) {
+        console.error("Error checking out:", error);
+      }
+    }
+    checkout();
+  }
   return (
     <div>
       <NavBar />
       <h2 style={{ display: "flex", justifyContent: "center" }}>Cart</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "right",
+          marginRight: "1rem",
+        }}
+      >
+        <MDBBtn color="success" onClick={handleCheckout}>
+          CheckOut
+        </MDBBtn>
+      </div>
       <MDBRow>
         {cart.length > 0 ? (
           cart.map((product) => (
             <MDBCol key={product._id} md="4">
-              <MDBCard className="wishlist-card">
+              <MDBCard className="same-size-card">
                 <MDBCardImage
                   className="wishlist-card-img-top"
-                  src={
-                    product.imageUrl[0] ||
-                    "https://mdbootstrap.com/img/new/standard/nature/184.webp"
-                  }
+                  src={`${process.env.REACT_APP_IMAGE_PREFIX}${product.imageUrls[0]}`}
                   position="top"
                   alt={product.name}
                 />
                 <MDBCardBody className="wishlist-card-body">
                   <MDBCardTitle>{product.name}</MDBCardTitle>
-                  <MDBCardText>{product.description}</MDBCardText>
+                  <MDBCardText>
+                    <TextExpander>{product.description}</TextExpander>
+                  </MDBCardText>
                   <MDBCardText>₹ {product.price}</MDBCardText>
                   <MDBRow>
                     <MDBCol sm="3">
                       <MDBCardText>Quantity</MDBCardText>
                     </MDBCol>
                     <MDBCol sm="9">
-                      <NumberButton initialCount={1} />
+                      <NumberButton
+                        id={product._id}
+                        initialCount={product.quantity}
+                      />
                     </MDBCol>
                   </MDBRow>
                   <MDBBtn
                     color="danger"
                     onClick={() => handleDelete(product._id)}
                   >
-                    Delete form cart
+                    Delete from cart
                   </MDBBtn>
                 </MDBCardBody>
               </MDBCard>

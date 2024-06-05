@@ -95,11 +95,11 @@ code {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 450px; /* Adjust the height as needed */
+  /* height: 450px; Adjust the height as needed */
 }
 
 .wishlist-card-img-top {
-  height: 200px; /* Adjust the image height as needed */
+  /* height: 200px; Adjust the image height as needed */
   object-fit: cover;
 }
 
@@ -114,4 +114,18 @@ code {
   justify-content: center;
   align-items: center;
   margin-top: 1rem;
+}
+
+.admin-seller-card {
+  height: 200px;
+  color: #a0deff !important;
+}
+.admin-product-card{
+  height: 250px;
+}
+
+
+.same-size-card img {
+  height: 300px;
+  object-fit: cover;
 }

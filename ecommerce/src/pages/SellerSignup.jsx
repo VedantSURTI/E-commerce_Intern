@@ -17,6 +17,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setSellerToken, setToken } from "../reducers/authSlice";
 import { MDBBtn, MDBInput } from "mdb-react-ui-kit";
+import axiosInstance from "../axiosInstance";
 
 function Copyright(props) {
   return (
@@ -116,7 +117,7 @@ export default function SellerSignup() {
           country: data.get("country"),
           zip: data.get("pincode"),
         },
-        location: { coordinates: [longitude, latitude] },
+        location: { type: "Point", coordinates: [longitude, latitude] },
         phone: data.get("phoneNumber"),
         photo: image,
         companyName: data.get("companyName"),
@@ -125,10 +126,7 @@ export default function SellerSignup() {
         accountNumber: data.get("accountNumber"),
       };
       //   console.log(sendData);
-      const res = await axios.post(
-        "http://192.168.20.173:5000/api/auth/sellers/signup",
-        sendData
-      );
+      const res = await axiosInstance.post("/auth/sellers/signup", sendData);
       // console.log(res);
       if (res.status === 201) {
         alert("Seller created successfully");
@@ -137,8 +135,6 @@ export default function SellerSignup() {
       }
     }
   };
-
-  function handleGoogleSubmit() {}
 
   return (
     <ThemeProvider theme={defaultTheme}>

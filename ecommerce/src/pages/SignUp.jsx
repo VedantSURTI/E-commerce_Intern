@@ -17,6 +17,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setToken } from "../reducers/authSlice";
 import { MDBInput } from "mdb-react-ui-kit";
+import axiosInstance from "../axiosInstance";
 function Copyright(props) {
   return (
     <Typography
@@ -115,15 +116,12 @@ export default function SignUp() {
           country: data.get("country"),
           zip: data.get("pincode"),
         },
-        location: { coordinates: [longitude, latitude] },
+        location: { type: "Point", coordinates: [longitude, latitude] },
         phone: data.get("phoneNumber"),
         photo: image,
       };
       console.log(sendData);
-      const res = await axios.post(
-        "http://192.168.20.173:5000/api/auth/customer/signup",
-        sendData
-      );
+      const res = await axiosInstance.post("/auth/customer/signup", sendData);
       // console.log(res);
       if (res.status === 201) {
         alert("User created successfully");

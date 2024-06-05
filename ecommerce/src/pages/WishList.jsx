@@ -13,6 +13,7 @@ import {
   MDBBtn,
   MDBRow,
 } from "mdb-react-ui-kit";
+import TextExpander from "./components/TextExpander";
 
 function WishList() {
   const [wishlist, setWishList] = useState([]);
@@ -81,19 +82,18 @@ function WishList() {
         {wishlist.length > 0 ? (
           wishlist.map((product) => (
             <MDBCol key={product._id} md="4">
-              <MDBCard className="wishlist-card">
+              <MDBCard className="same-size-card">
                 <MDBCardImage
                   className="wishlist-card-img-top"
-                  src={
-                    product.imageUrl[0] ||
-                    "https://mdbootstrap.com/img/new/standard/nature/184.webp"
-                  }
+                  src={`${process.env.REACT_APP_IMAGE_PREFIX}${product.imageUrls[0]}`}
                   position="top"
                   alt={product.name}
                 />
                 <MDBCardBody className="wishlist-card-body">
                   <MDBCardTitle>{product.name}</MDBCardTitle>
-                  <MDBCardText>{product.description}</MDBCardText>
+                  <MDBCardText>
+                    <TextExpander>{product.description}</TextExpander>
+                  </MDBCardText>
                   <MDBCardText>₹ {product.price}</MDBCardText>
                   <MDBBtn
                     color="danger"
@@ -101,7 +101,7 @@ function WishList() {
                   >
                     Delete form wishlist
                   </MDBBtn>
-                  <MDBBtn
+                  <MDBBtn style={{marginTop: "1rem"}}
                     color="success"
                     onClick={() => addToCart(product._id, token)}
                   >

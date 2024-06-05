@@ -9,9 +9,11 @@ import {
   MDBCol,
   MDBInput,
   MDBBtn,
+  MDBCardText,
 } from "mdb-react-ui-kit";
 import axiosInstance from "../../axiosInstance";
 import { useSelector } from "react-redux";
+import { Typography } from "@mui/material";
 
 function CreateSubCategory() {
   const authState = useSelector((state) => state.auth);
@@ -73,7 +75,7 @@ function CreateSubCategory() {
                     })
                   }
                 >
-                  {category.name}
+                  <Typography>{category.name}</Typography>
                 </MDBDropdownItem>
               ))}
             </MDBDropdownMenu>

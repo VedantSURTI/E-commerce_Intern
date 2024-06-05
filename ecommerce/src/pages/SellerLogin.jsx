@@ -16,7 +16,12 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setSellerToken, setToken, updateUserLocation } from "../reducers/authSlice";
+import {
+  setSellerToken,
+  setToken,
+  updateUserLocation,
+} from "../reducers/authSlice";
+import axiosInstance from "../axiosInstance";
 
 function Copyright(props) {
   return (
@@ -86,19 +91,21 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const location = { coordinates: [latitude, longitude] };
+    const location = {type:'Point', coordinates: [latitude, longitude] };
     const sendData = {
       email: data.get("email"),
       password: data.get("password"),
     };
     // console.log(sendData);
-    const loginResponse = await axios.post(
-      "http://192.168.20.173:5000/api/auth/sellers/login",
+    const loginResponse = await axiosInstance.post(
+      "/auth/sellers/login",
       sendData
     );
-    dispatch(setSellerToken(loginResponse.data.token, loginResponse.data.seller));
-    const locationUpdateResponse = await axios.put(
-      "http://192.168.20.173:5000/api/auth/sellers/location",
+    dispatch(
+      setSellerToken(loginResponse.data.token, loginResponse.data.seller)
+    );
+    const locationUpdateResponse = await axiosInstance.put(
+      "/auth/sellers/location",
       location,
       {
         headers: { Authorization: `Bearer ${loginResponse.data.token}` },

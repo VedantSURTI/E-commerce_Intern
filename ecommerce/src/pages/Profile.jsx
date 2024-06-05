@@ -30,6 +30,7 @@ import {
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import axiosInstance from "../axiosInstance";
 export default function Profile() {
   const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -109,8 +110,8 @@ export default function Profile() {
       photo: photo,
     };
     dispatch(updateUserData(sendData));
-    const UserDataUpdate = await axios.put(
-      "http://192.168.20.173:5000/api/users-update/profile-update",
+    const UserDataUpdate = await axiosInstance.put(
+      "/users-update/profile-update",
       sendData,
       {
         headers: { Authorization: `Bearer ${authState.token}` },
@@ -189,9 +190,7 @@ export default function Profile() {
                       <MDBCardText>Email</MDBCardText>
                     </MDBCol>
                     <MDBCol sm="9">
-                      <MDBCardText className="text-muted">
-                        {email}
-                      </MDBCardText>
+                      <MDBCardText className="text-muted">{email}</MDBCardText>
                     </MDBCol>
                   </MDBRow>
                   <hr />

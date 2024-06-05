@@ -9,9 +9,10 @@ import {
 } from "mdb-react-ui-kit";
 import Slider from "@mui/material/Slider";
 import Dropdown from "./Dropdown";
+import { useEffect, useState } from "react";
+import axiosInstance from "../../axiosInstance";
+import { useParams } from "react-router";
 function Filters({
-  subcategories_names,
-  brands_names,
   subcategory,
   brand,
   maxPrice,
@@ -22,8 +23,32 @@ function Filters({
   onChangeMaxPrice,
   sort,
   onClickFilter,
-})
- {
+}) {
+  const [subcategory_names, setSubcategory_names] = useState([]);
+  const { id } = useParams();
+  useEffect(() => {
+    async function getSubcategories() {
+      try {
+        const response = await axiosInstance.get(
+          `/categories/${id}/subcategories`
+        );
+        // console.log(response.data);
+        const subCategoryNames = response.data.map((subcategory) => {
+          return { name: subcategory.name, _id: subcategory._id };
+        });
+        setSubcategory_names(subCategoryNames);
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+      }
+    }
+    getSubcategories();
+  }, [id]);
+  // console.log(subcategory_names);
+  // const subcategory_names = [
+  //   { _id: 4, name: "Electronics" },
+  //   { _id: 5, name: "Clothing" },
+  //   { _id: 6, name: "Footwear" },
+  // ];
   return (
     <div>
       <MDBCard>
@@ -31,18 +56,10 @@ function Filters({
           <MDBRow>
             <MDBCol>
               <Dropdown
-                subcategories={subcategories_names}
+                subcategories={subcategory_names}
                 name={"Sub Categories"}
                 value={subcategory}
                 handleChange={onChangeCategory}
-              />
-            </MDBCol>
-            <MDBCol>
-              <Dropdown
-                subcategories={brands_names}
-                name={"Brands"}
-                value={brand}
-                handleChange={onChangeBrand}
               />
             </MDBCol>
             <MDBCol>

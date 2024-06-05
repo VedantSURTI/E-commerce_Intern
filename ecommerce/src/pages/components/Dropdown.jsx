@@ -5,7 +5,14 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-export default function BasicSelect({ subcategories, name, value, handleChange }) {
+export default function BasicSelect({
+  subcategories,
+  name,
+  value,
+  handleChange,
+}) {
+  // console.log(subcategories);
+  // console.log(value);
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
@@ -13,12 +20,14 @@ export default function BasicSelect({ subcategories, name, value, handleChange }
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={value}
+          value={value.name} // Use the id for the value
           label="Sub Categories"
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, subcategories.find(sub => sub.name === e.target.value))} // Pass the event and the selected subcategory
         >
-          {subcategories.map((ele) => (
-            <MenuItem value={ele}>{ele}</MenuItem>
+          {subcategories.map((subcategory) => (
+            <MenuItem key={subcategory._id} value={subcategory?.name}>
+              {subcategory.name}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
