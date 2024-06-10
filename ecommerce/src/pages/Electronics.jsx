@@ -16,6 +16,7 @@ import axiosInstance from "../axiosInstance";
 import { useSelector } from "react-redux";
 import Footer from "./components/Footer";
 import Pagination from "@mui/material/Pagination";
+import TextExpander from "./components/TextExpander";
 
 const sort_names = [
   { _id: 1, name: "asc" },
@@ -36,7 +37,6 @@ function Electronics() {
   const navigate = useNavigate();
   const { id } = useParams();
   const limit = 3;
-
 
   const handleChangecategory = (e, selectedSubcategory) => {
     setSubcategory({
@@ -63,16 +63,17 @@ function Electronics() {
   };
   console.log(page);
   const getFilteredProducts = async (token, params) => {
+    const temp = {
+      type: "Point",
+      coordinates: [
+        authState.user.location.coordinates.coordinates[0],
+        authState.user.location.coordinates.coordinates[1],
+      ],
+    };
     try {
       const response = await axiosInstance.post(
         "/customer/products/getproducts",
-        {
-          type: "Point",
-          coordinates: [
-            authState.user.location.coordinates[1],
-            authState.user.location.coordinates[0],
-          ],
-        },
+        temp,
         {
           params,
           headers: {
@@ -146,8 +147,9 @@ function Electronics() {
       <MDBRow style={{ marginRight: "0" }}>
         {products.map((product) => (
           <MDBCol key={product._id} md="4">
-            <MDBCard style={{ margin: "1rem" }}>
+            <MDBCard style={{ margin: "1rem" }} className="same-size-card">
               <MDBCardImage
+                className="same-size-card-image"
                 src={
                   `${process.env.REACT_APP_IMAGE_PREFIX}${product.imageUrls[0]}` ||
                   "https://mdbootstrap.com/img/new/standard/nature/184.webp"
@@ -157,8 +159,8 @@ function Electronics() {
               />
               <MDBCardBody>
                 <MDBCardTitle>{product.name}</MDBCardTitle>
-                <MDBCardText>{product.description}</MDBCardText>
-                <MDBCardText>{product.price}</MDBCardText>
+                <TextExpander>{product.description}</TextExpander>
+                <MDBCardText>₹ {product.price}</MDBCardText>
                 <MDBBtn onClick={() => navigate(`/product/${product._id}`)}>
                   View Details
                 </MDBBtn>

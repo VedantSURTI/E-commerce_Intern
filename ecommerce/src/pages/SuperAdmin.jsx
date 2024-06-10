@@ -24,6 +24,7 @@ import { Create } from "@mui/icons-material";
 import CreateSubCategory from "./components/CreateSubCategory";
 import CreateMainCategory from "./components/CreateMainCategory";
 import AdminProductList from "./components/AdminProductList";
+import { NavLink } from "react-router-dom";
 
 function SuperAdmin() {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -67,6 +68,11 @@ function SuperAdmin() {
                     <FontAwesomeIcon icon={faSitemap} />
                   </ListItemIcon>
                   <ListItemText primary="Create Main Category" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem onClick={() => setSelectedIndex(4)}>
+                <ListItemButton>
+                  <NavLink to='/support'>Chat with Customer</NavLink>
                 </ListItemButton>
               </ListItem>
             </List>

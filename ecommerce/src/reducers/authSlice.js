@@ -68,6 +68,14 @@ const authSlice = createSlice({
         state.user = action.payload;
       },
     },
+    updateSellerData: {
+      prepare(seller) {
+        return { payload: seller };
+      },
+      reducer(state, action) {
+        state.seller = action.payload;
+      },
+    },
     updateUserLocation: {
       reducer(state, action) {
         state.user.location.coordinates = action.payload;
@@ -118,6 +126,7 @@ export const {
   updateUserData,
   updateUserLocation,
   setSellerToken,
+  updateSellerData,
   logoutBoth,
 } = authSlice.actions;
 

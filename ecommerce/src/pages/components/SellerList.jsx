@@ -43,11 +43,15 @@ export default function Seller() {
 
   const handleDeleteSeller = async (sellerId) => {
     try {
-      await axiosInstance.delete(`/auth/sellers/delete/${sellerId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Add the JWT token here
-        },
-      });
+      await axiosInstance.put(
+        `/auth/sellers/delete/${sellerId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       alert("Seller deleted successfully");
       setSellers(sellers.filter((seller) => seller._id !== sellerId));
     } catch (error) {

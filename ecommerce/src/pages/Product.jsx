@@ -37,8 +37,8 @@ function Carousel({ images }) {
       {images.map((ele, i) => (
         <MDBCarouselItem itemId={i + 1} key={i + 1}>
           <img
-            src={`http://localhost:5000${ele}`}
-            className="d-block w-100"
+            src={`${process.env.REACT_APP_IMAGE_PREFIX}${ele}`}
+            className="same-size-card-image d-block w-100"
             alt={`Slide ${i + 1}`}
           />
         </MDBCarouselItem>
@@ -135,7 +135,7 @@ export default function Product() {
       }
     };
     fetchReviews(id);
-    // console.log(reviews);
+    console.log(reviews);
   }, [id]);
   // fetchReviews(id).then((data) => setReviews(data));
   // console.log(reviews);
@@ -212,7 +212,7 @@ export default function Product() {
                     </MDBCol>
                     <MDBCol sm="9">
                       <MDBCardText className="text-muted">
-                        {product.price} $
+                        ₹ {product.price}
                       </MDBCardText>
                     </MDBCol>
                   </MDBRow>

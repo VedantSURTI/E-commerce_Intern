@@ -96,21 +96,34 @@ function NavBar() {
   };
 
   async function handleLogout() {
+    let response;
     try {
-      const response = await axiosInstance.post(
-        `/auth/customer/logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${authState.token}`,
-          },
-        }
-      );
+      if (authState.seller.email === "") {
+        response = await axiosInstance.post(
+          `/auth/customer/logout`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${authState.token}`,
+            },
+          }
+        );
+      } else {
+        response = await axiosInstance.post(
+          `/auth/customer/logoutseller`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${authState.token}`,
+            },
+          }
+        );
+      }
 
       if (response.status === 200) {
         // Update authState
         dispatch(logoutBoth());
-
+        alert("Logout successful");
         // Redirect to login page
         navigate("/");
       } else {

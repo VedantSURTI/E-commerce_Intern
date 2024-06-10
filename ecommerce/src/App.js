@@ -21,6 +21,8 @@ import SuperAdmin from "./pages/SuperAdmin";
 import AdminOnlyRoute from "./pages/components/AdminOnlyRoute";
 import DashBoard from "./pages/DashBoard";
 import PaymentSuccessfull from "./pages/PaymentSuccessfull";
+import ManageProducts from "./pages/ManageProducts";
+import ManageOrders from "./pages/ManageOrders";
 
 function App() {
   const authState = useSelector((state) => state.auth);
@@ -68,6 +70,14 @@ function App() {
           <Route
             path="/dashboard"
             element={<PrivateRoute element={DashBoard} />}
+          />
+          <Route
+            path="/manage-products"
+            element={<PrivateRoute element={ManageProducts} />}
+          />
+          <Route
+            path="/manage-orders"
+            element={<PrivateRoute element={ManageOrders} />}
           />
           <Route
             path="/super-admin"
