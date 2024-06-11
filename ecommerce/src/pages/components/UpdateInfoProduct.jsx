@@ -10,12 +10,10 @@ import {
   MDBRow,
 } from "mdb-react-ui-kit";
 import TextExpander from "./TextExpander";
-import { useSelector } from "react-redux";
 import UpdateProduct from "./UpdateProduct";
 
 function UpdateInfoProduct({ products, setProducts }) {
   const [updateInProcess, setUpdateInProcess] = useState(0);
-  const authState = useSelector((state) => state.auth);
   return (
     <div>
       {updateInProcess === 0 ? (

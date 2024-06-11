@@ -70,9 +70,14 @@ function SuperAdmin() {
                   <ListItemText primary="Create Main Category" />
                 </ListItemButton>
               </ListItem>
-              <ListItem onClick={() => setSelectedIndex(4)}>
+              <ListItem>
                 <ListItemButton>
-                  <NavLink to='/support'>Chat with Customer</NavLink>
+                  <NavLink to="/support">Chat with Customer</NavLink>
+                </ListItemButton>
+              </ListItem>
+              <ListItem>
+                <ListItemButton>
+                  <NavLink to="/seller-admin">Announcments to Sellers</NavLink>
                 </ListItemButton>
               </ListItem>
             </List>

@@ -6,7 +6,6 @@ import {
   MDBCard,
   MDBCardTitle,
   MDBCol,
-  MDBProgress,
   MDBRow,
 } from "mdb-react-ui-kit";
 

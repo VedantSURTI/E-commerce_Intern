@@ -11,64 +11,6 @@ import axiosInstance from "../../../axiosInstance";
 const ENDPOINT = "http://192.168.20.173:5000";
 let socket, selectedChatCompare;
 
-// import React, { useState, useEffect } from 'react';
-// import io from 'socket.io-client';
-
-// const ChatComponent = () => {
-//   const [socket, setSocket] = useState(null);
-//   const [messages, setMessages] = useState([]);
-//   const [inputMessage, setInputMessage] = useState('');
-
-// useEffect(() => {
-//   // Connect to the server socket
-//   const newSocket = io('http://localhost:5000');
-//   setSocket(newSocket);
-
-//   // Listen for incoming messages
-//   newSocket.on('chat message', (message) => {
-//     setMessages((prevMessages) => [...prevMessages, message]);
-//   });
-
-//   // Clean up function to disconnect socket when component unmounts
-//   return () => {
-//     newSocket.disconnect();
-//   };
-// }, []);
-
-// const sendMessage = () => {
-//   // Send message to the server
-//   socket.emit('chat message', {
-//     senderId: 'yourSenderId', // Replace with the sender's ID
-//     receiverId: 'yourReceiverId', // Replace with the receiver's ID
-//     message: inputMessage
-//   });
-
-//   // Clear input field
-//   setInputMessage('');
-// };
-
-//   return (
-//     <div>
-//       <h1>Chat</h1>
-//       <div>
-//         {messages.map((message, index) => (
-//           <div key={index}>
-//             <p>{message.message}</p>
-//           </div>
-//         ))}
-//       </div>
-//       <input
-//         type="text"
-//         value={inputMessage}
-//         onChange={(e) => setInputMessage(e.target.value)}
-//       />
-//       <button onClick={sendMessage}>Send</button>
-//     </div>
-//   );
-// };
-
-// export default ChatComponent;
-
 function SingleChat({
   selectedChat,
   setSelectedChat,
@@ -156,42 +98,6 @@ function SingleChat({
     selectedChatCompare = selectedChat;
   }, [selectedChat, fetchAgain]);
 
-  // useEffect(() => {
-  //   socket.on("message recieved", (message) => {
-  //     if (
-  //       !selectedChatCompare ||
-  //       selectedChatCompare._id !== message.chat._id
-  //     ) {
-  //       // Give notification
-  //     } else {
-  //       setMessages([...messages, message]);
-  //     }
-  //   });
-  // });
-
-  // const sendMessage = async (e) => {
-  //   if (e.key === "Enter" && newMessage) {
-  //     try {
-  //       // send message here
-  //       // const config = {
-  //       //   headers: {
-  //       //     "Content-Type": "application/json",
-  //       //     Authorization: `Bearer ${authState.token}`,
-  //       //   },
-  //       // };
-  //       setNewMessage("");
-  //       // const res = await axiosInstance.post(
-  //       //   `/chats/${selectedChat._id}/messages`,
-  //       //   { text: newMessage },
-  //       //   config
-  //       // );
-  //       // socket.emit('new message',res.data);
-  //       // setMessages([...messages, res.data]);
-  //     } catch (error) {
-  //       alert("Error: ", error);
-  //     }
-  //   }
-  // };
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
     // Typing indicator

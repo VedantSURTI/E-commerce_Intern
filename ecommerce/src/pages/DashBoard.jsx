@@ -8,24 +8,7 @@ import {
   MDBCardImage,
   MDBCardText,
 } from "mdb-react-ui-kit";
-import {
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
-import {
-  faUser,
-  faBoxesStacked,
-  faSitemap,
-} from "@fortawesome/free-solid-svg-icons";
-import {
-  faBagShopping,
-  faCartShopping,
-  faHeart,
-  faPhone,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBagShopping, faBullhorn } from "@fortawesome/free-solid-svg-icons";
 import { NavLink } from "react-router-dom";
 import Footer from "./components/Footer";
 import {
@@ -36,7 +19,6 @@ import {
 } from "mdb-react-ui-kit";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import CreateProduct from "./components/CreateProduct";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../axiosInstance";
 import { updateSellerData } from "../reducers/authSlice";
@@ -215,6 +197,12 @@ function DashBoard() {
                     <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3">
                       <FontAwesomeIcon icon={faBagShopping} />
                       <NavLink to="/manage-orders">Manage Orders</NavLink>
+                    </MDBListGroupItem>
+                    <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3">
+                      <FontAwesomeIcon icon={faBullhorn} />
+                      <NavLink to="/seller-admin">
+                        Announcments from Admin
+                      </NavLink>
                     </MDBListGroupItem>
                   </MDBListGroup>
                 </MDBCardBody>
